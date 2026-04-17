@@ -8,6 +8,18 @@ const API = axios.create({
   baseURL: "https://mentor-backend-8zgn.onrender.com"
 });
 
+// ✅ ADD THIS RIGHT HERE
+API.interceptors.request.use((config) => {
+  const token =
+    sessionStorage.getItem("token") || localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
 export default function Recommendations() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
