@@ -1,18 +1,19 @@
 import axios from "axios";
 import React, { createContext, useState, useContext, useEffect } from "react";
 
-// ✅ Create ONE axios instance
 const API = axios.create({
-  baseURL: "https://mentor-backend-8zgn.onrender.com"
+  baseURL: "https://mentor-backend-8zgn.onrender.com",
 });
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
   const [token, setToken] = useState(
     sessionStorage.getItem("token") || localStorage.getItem("token")
   );
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,28 +23,42 @@ export const AuthProvider = ({ children }) => {
     if (activeToken) {
       sessionStorage.setItem("token", activeToken);
 
-      // ✅ Set token for API instance
-      API.defaults.headers.common["Authorization"] = `Bearer ${activeToken}`;
+      API.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${activeToken}`;
 
       API.get("/api/users/me")
-        .then((res) => setUser(res.data))
-        .catch(() => logout())
-        .finally(() => setLoading(false));
+        .then((res) => {
+          setUser(res.data);
+        })
+        .catch(() => {
+          logout();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } else {
       setLoading(false);
     }
   }, [token]);
 
   const login = async (email, password) => {
-    const { data } = await API.post("/api/auth/login", { email, password });
+    const { data } = await API.post("/api/auth/login", {
+      email,
+      password,
+    });
 
     sessionStorage.setItem("token", data.token);
     localStorage.setItem("token", data.token);
 
-    API.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+    API.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${data.token}`;
 
     setToken(data.token);
-    setUser(data.user);
+
+    // FIXED HERE
+    setUser(data);
 
     return data;
   };
@@ -54,10 +69,14 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem("token", data.token);
     localStorage.setItem("token", data.token);
 
-    API.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+    API.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${data.token}`;
 
     setToken(data.token);
-    setUser(data.user);
+
+    // FIXED HERE
+    setUser(data);
 
     return data;
   };
@@ -101,7 +120,7 @@ export const AuthProvider = ({ children }) => {
         updateUser,
         isMentor,
         isMentee,
-        isBoth
+        isBoth,
       }}
     >
       {children}
