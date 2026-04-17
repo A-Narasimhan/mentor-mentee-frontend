@@ -316,44 +316,57 @@ export default function Register() {
                   <option value="advanced">
                     Advanced
                   </option>
+                  <option value="expert">
+                    Expert
+                  </option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Skills</label>
+  <label>Skills</label>
 
-                <input
-                  value={skillInput}
-                  placeholder="Type skill & press Enter"
-                  onChange={(e) =>
-                    setSkillInput(e.target.value)
-                  }
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    (e.preventDefault(),
-                    addSkill(skillInput))
-                  }
-                />
+  {/* Manual input */}
+  <input
+    value={skillInput}
+    placeholder="Type skill & press Enter"
+    onChange={(e) => setSkillInput(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addSkill(skillInput);
+      }
+    }}
+  />
 
-                <div className="tags-list">
-                  {form.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="tag"
-                    >
-                      {skill}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeSkill(skill)
-                        }
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
+  {/* Suggested skill buttons */}
+  <div className="suggestions">
+    {SKILL_SUGGESTIONS.map((skill) => (
+      <span
+        key={skill}
+        className="badge"
+        onClick={() => addSkill(skill)}
+        style={{ cursor: "pointer" }}
+      >
+        {skill}
+      </span>
+    ))}
+  </div>
+
+  {/* Selected skills */}
+  <div className="tags-list">
+    {form.skills.map((skill) => (
+      <span key={skill} className="tag">
+        {skill}
+        <button
+          type="button"
+          onClick={() => removeSkill(skill)}
+        >
+          ×
+        </button>
+      </span>
+    ))}
+  </div>
+</div>
 
               <div
                 style={{
