@@ -1,3 +1,44 @@
+:root {
+  --bg: #0f172a;
+  --surface2: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --accent: #6366f1;
+  --accent2: #f43f5e;
+}
+
+/* ADD THIS */
+input, textarea, select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-outline {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* KEEP YOUR EXISTING CSS BELOW */
 .auth-page {
   display: flex;
   min-height: 100vh;
