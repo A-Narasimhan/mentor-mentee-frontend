@@ -1,0 +1,95 @@
+.sessions-page { display: flex; flex-direction: column; gap: 24px; }
+
+.filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-tab:hover { border-color: var(--accent); color: var(--text); }
+.filter-tab.active { border-color: var(--accent); background: rgba(108,99,255,0.12); color: var(--accent); }
+
+.count {
+  background: var(--surface2);
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: 12px;
+}
+.filter-tab.active .count { background: rgba(108,99,255,0.2); }
+
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.session-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+.session-card:hover { border-color: var(--accent); }
+
+.session-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.session-card-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.session-card-with { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+.session-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+.session-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.session-actions { display: flex; gap: 10px; }
+
+.btn-accept {
+  flex: 1;
+  padding: 10px;
+  background: rgba(67,233,123,0.15);
+  border: 1px solid var(--accent3);
+  color: var(--accent3);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-accept:hover { background: rgba(67,233,123,0.25); }
+
+.btn-reject {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255,101,132,0.1);
+  border: 1px solid var(--accent2);
+  color: var(--accent2);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-reject:hover { background: rgba(255,101,132,0.2); }

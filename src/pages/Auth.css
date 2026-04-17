@@ -1,0 +1,218 @@
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth-left {
+  flex: 1;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1030 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-left::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(108,99,255,0.2) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.auth-hero {
+  text-align: center;
+  z-index: 1;
+  position: relative;
+}
+
+.hero-icon { font-size: 56px; margin-bottom: 16px; }
+
+.auth-hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.auth-hero p {
+  color: var(--text-dim);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.stat { text-align: center; }
+.stat span {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.stat small { color: var(--text-dim); font-size: 13px; }
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 40px;
+}
+
+.step-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-dim);
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: var(--border);
+}
+
+.step-label {
+  margin-top: 12px !important;
+  font-size: 14px !important;
+  color: var(--accent) !important;
+}
+
+.auth-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.auth-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.auth-sub {
+  color: var(--text-dim);
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+.auth-btn { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; }
+
+.auth-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.auth-link a { color: var(--accent); font-weight: 500; }
+
+.role-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.role-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.role-btn small { font-size: 12px; font-weight: 400; color: var(--text-dim); }
+.role-btn.active-mentee { border-color: var(--accent2); background: rgba(255,101,132,0.1); }
+.role-btn.active-mentor { border-color: var(--accent); background: rgba(108,99,255,0.1); }
+
+.tag-input { display: flex; flex-direction: column; gap: 8px; }
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 6px; }
+.suggestions .badge { cursor: pointer; transition: all 0.2s; }
+.suggestions .badge:hover { border-color: var(--accent); color: var(--accent); }
+
+.tags-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags-list .tag button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  margin-left: 4px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+.tags-list .tag button:hover { opacity: 1; }
+
+@media (max-width: 768px) {
+  .auth-page { flex-direction: column; }
+  .auth-left { padding: 32px 24px; flex: none; }
+  .auth-hero h1 { font-size: 28px; }
+  .hero-stats { gap: 20px; }
+  .auth-right { padding: 24px; }
+}
