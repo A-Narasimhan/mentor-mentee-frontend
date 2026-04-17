@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     API.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
     setToken(data.token);
-    setUser(data);
+    setUser(data.user);
 
     return data;
   };
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     API.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
     setToken(data.token);
-    setUser(data);
+    setUser(data.user);
 
     return data;
   };
