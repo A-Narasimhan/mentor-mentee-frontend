@@ -3,7 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
 
-const SKILL_SUGGESTIONS = ["React", "Node.js", "Python", "Java", "ML", "DSA", "MongoDB", "SQL", "UI/UX", "DevOps"];
+const SKILL_SUGGESTIONS = [
+  "React",
+  "Node.js",
+  "Python",
+  "Java",
+  "ML",
+  "DSA",
+  "MongoDB",
+  "SQL",
+  "UI/UX",
+  "DevOps",
+];
 
 export default function Register() {
   const { register } = useAuth();
@@ -17,52 +28,71 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    role: "",              // 🔥 start empty (force selection)
+    role: "",
+    roles: [],
     bio: "",
     domain: "",
     experienceLevel: "beginner",
     skills: [],
-    interests: []
+    interests: [],
   });
 
   const [skillInput, setSkillInput] = useState("");
   const [interestInput, setInterestInput] = useState("");
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // ✅ ROLE FIX (IMPORTANT)
-  const handleRoleSelect = (role) => {
     setForm({
       ...form,
-      role,
-      roles: role === "both" ? ["mentor", "mentee"] : [role]
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // ✅ Proper role handling
+  const handleRoleSelect = (selectedRole) => {
+    setForm({
+      ...form,
+      role: selectedRole,
+      roles:
+        selectedRole === "both"
+          ? ["mentor", "mentee"]
+          : [selectedRole],
     });
   };
 
   const addSkill = (skill) => {
     const s = skill.trim();
     if (s && !form.skills.includes(s)) {
-      setForm({ ...form, skills: [...form.skills, s] });
+      setForm({
+        ...form,
+        skills: [...form.skills, s],
+      });
     }
     setSkillInput("");
   };
 
-  const removeSkill = (s) => {
-    setForm({ ...form, skills: form.skills.filter((x) => x !== s) });
+  const removeSkill = (skill) => {
+    setForm({
+      ...form,
+      skills: form.skills.filter((s) => s !== skill),
+    });
   };
 
   const addInterest = () => {
     const i = interestInput.trim();
     if (i && !form.interests.includes(i)) {
-      setForm({ ...form, interests: [...form.interests, i] });
+      setForm({
+        ...form,
+        interests: [...form.interests, i],
+      });
     }
     setInterestInput("");
   };
 
-  const removeInterest = (i) => {
-    setForm({ ...form, interests: form.interests.filter((x) => x !== i) });
+  const removeInterest = (interest) => {
+    setForm({
+      ...form,
+      interests: form.interests.filter((i) => i !== interest),
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -71,12 +101,14 @@ export default function Register() {
     setLoading(true);
 
     try {
-      console.log("REGISTER FORM:", form); // 🔥 debug
+      console.log("REGISTER FORM:", form);
 
       await register(form);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(
+        err.response?.data?.message || "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -84,92 +116,276 @@ export default function Register() {
 
   return (
     <div className="auth-page">
+      {/* LEFT SIDE */}
       <div className="auth-left">
         <div className="auth-hero">
           <div className="hero-icon">⚡</div>
           <h1>MentorMatch</h1>
-          <p>Join as a mentor or mentee.<br />Build your future together.</p>
+          <p>
+            Join as a mentor or mentee.
+            <br />
+            Build your future together.
+          </p>
+
+          <div className="step-indicator">
+            <div className={`step-dot ${step >= 1 ? "active" : ""}`}>
+              1
+            </div>
+            <div className="step-line"></div>
+            <div className={`step-dot ${step >= 2 ? "active" : ""}`}>
+              2
+            </div>
+          </div>
+
+          <p className="step-label">
+            {step === 1
+              ? "Basic Info & Role"
+              : "Skills & Profile"}
+          </p>
         </div>
       </div>
 
+      {/* RIGHT SIDE */}
       <div className="auth-right">
         <div className="auth-card">
           <h2>Create Account</h2>
+          <p className="auth-sub">
+            Step {step} of 2
+          </p>
 
-          {error && <div className="alert-error">{error}</div>}
+          {error && (
+            <div className="alert-error">{error}</div>
+          )}
 
           {/* STEP 1 */}
           {step === 1 && (
             <div className="auth-form">
-              <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
-              <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-              <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} />
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  name="name"
+                  placeholder="Your Name"
+                  value={form.name}
+                  onChange={handleChange}
+                />
+              </div>
 
-              <label>Select Role</label>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </div>
 
-              <div className="role-select">
-                <button type="button" onClick={() => handleRoleSelect("mentee")}>
-                  Mentee
-                </button>
-                <button type="button" onClick={() => handleRoleSelect("mentor")}>
-                  Mentor
-                </button>
-                <button type="button" onClick={() => handleRoleSelect("both")}>
-                  Both
-                </button>
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Minimum 6 characters"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Select Role</label>
+
+                <div className="role-select">
+                  <button
+                    type="button"
+                    className={`role-btn ${
+                      form.role === "mentee"
+                        ? "active-mentee"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      handleRoleSelect("mentee")
+                    }
+                  >
+                    🎓 Mentee
+                    <small>I need guidance</small>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`role-btn ${
+                      form.role === "mentor"
+                        ? "active-mentor"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      handleRoleSelect("mentor")
+                    }
+                  >
+                    🏆 Mentor
+                    <small>I offer guidance</small>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`role-btn ${
+                      form.role === "both"
+                        ? "active-mentor"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      handleRoleSelect("both")
+                    }
+                  >
+                    🔄 Both
+                    <small>Mentor + Mentee</small>
+                  </button>
+                </div>
               </div>
 
               <button
+                className="btn-primary auth-btn"
                 type="button"
                 onClick={() => {
-                  if (!form.name || !form.email || !form.password) {
-                    setError("Fill all fields");
+                  if (
+                    !form.name ||
+                    !form.email ||
+                    !form.password
+                  ) {
+                    setError(
+                      "Please fill all required fields"
+                    );
                     return;
                   }
+
                   if (!form.role) {
-                    setError("Select a role");
+                    setError(
+                      "Please select your role"
+                    );
                     return;
                   }
+
+                  setError("");
                   setStep(2);
                 }}
               >
-                Next
+                Next →
               </button>
             </div>
           )}
 
           {/* STEP 2 */}
           {step === 2 && (
-            <form onSubmit={handleSubmit}>
-              <textarea name="bio" placeholder="Bio" value={form.bio} onChange={handleChange} />
-              <input name="domain" placeholder="Domain" value={form.domain} onChange={handleChange} />
-
-              <select name="experienceLevel" value={form.experienceLevel} onChange={handleChange}>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-
-              <input
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
-              />
-
-              <div>
-                {form.skills.map((s) => (
-                  <span key={s}>{s}</span>
-                ))}
+            <form
+              onSubmit={handleSubmit}
+              className="auth-form"
+            >
+              <div className="form-group">
+                <label>Bio</label>
+                <textarea
+                  name="bio"
+                  placeholder="Tell something about yourself..."
+                  value={form.bio}
+                  onChange={handleChange}
+                />
               </div>
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Creating..." : "Create Account"}
-              </button>
+              <div className="form-group">
+                <label>Domain / Field</label>
+                <input
+                  name="domain"
+                  placeholder="Web Dev / AI / Design..."
+                  value={form.domain}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Experience Level</label>
+                <select
+                  name="experienceLevel"
+                  value={form.experienceLevel}
+                  onChange={handleChange}
+                >
+                  <option value="beginner">
+                    Beginner
+                  </option>
+                  <option value="intermediate">
+                    Intermediate
+                  </option>
+                  <option value="advanced">
+                    Advanced
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Skills</label>
+
+                <input
+                  value={skillInput}
+                  placeholder="Type skill & press Enter"
+                  onChange={(e) =>
+                    setSkillInput(e.target.value)
+                  }
+                  onKeyDown={(e) =>
+                    e.key === "Enter" &&
+                    (e.preventDefault(),
+                    addSkill(skillInput))
+                  }
+                />
+
+                <div className="tags-list">
+                  {form.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="tag"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeSkill(skill)
+                        }
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setStep(1)}
+                >
+                  ← Back
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn-primary auth-btn"
+                  disabled={loading}
+                  style={{ flex: 1 }}
+                >
+                  {loading
+                    ? "Creating..."
+                    : "Create Account ✨"}
+                </button>
+              </div>
             </form>
           )}
 
-          <p>
-            Already have an account? <Link to="/login">Login</Link>
+          <p className="auth-link">
+            Already have an account?{" "}
+            <Link to="/login">Sign In</Link>
           </p>
         </div>
       </div>
