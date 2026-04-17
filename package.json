@@ -15,7 +15,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build"
   },
-  "proxy": "http://https://mentor-backend-8zgn.onrender.com",
+  "proxy": "https://mentor-backend-8zgn.onrender.com",
   "browserslist": {
     "production": [
       ">0.2%",

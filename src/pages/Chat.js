@@ -27,7 +27,7 @@ export default function Chat() {
   }, [activeUser]);
 
   useEffect(() => {
-    socket = io("http://https://mentor-backend-8zgn.onrender.com");
+    socket = io("https://mentor-backend-8zgn.onrender.com");
     socket.emit("join", user._id.toString());
 
     socket.on("receiveMessage", ({ senderId, message, timestamp }) => {
