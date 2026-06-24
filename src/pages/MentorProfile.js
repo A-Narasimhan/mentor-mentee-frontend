@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { API } from "../context/AuthContext";
 import "./MentorProfile.css";
 
 export default function MentorProfile() {
@@ -16,21 +16,28 @@ export default function MentorProfile() {
   const [review, setReview] = useState({ rating: 5, comment: "" });
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     Promise.all([
-      axios.get(`/api/users/${id}`),
-      axios.get(`/api/reviews/${id}`),
-    ]).then(([u, r]) => {
-      setMentor(u.data);
-      setReviews(r.data);
-    }).finally(() => setLoading(false));
+      API.get(`/api/users/${id}`),
+      API.get(`/api/reviews/${id}`),
+    ])
+      .then(([u, r]) => {
+        setMentor(u.data);
+        setReviews(Array.isArray(r.data) ? r.data : []);
+      })
+      .catch((err) => {
+        console.error("Failed to load mentor profile:", err);
+        setError("Could not load this profile. Please try again.");
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   const bookSession = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/sessions", { mentorId: id, ...session });
+      await API.post(`/api/sessions`, { mentorId: id, ...session });
       setMsg("✅ Session booked! Waiting for mentor approval.");
       setShowBook(false);
     } catch (err) {
@@ -41,7 +48,7 @@ export default function MentorProfile() {
   const submitReview = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("/api/reviews", { mentorId: id, ...review });
+      const { data } = await API.post(`/api/reviews`, { mentorId: id, ...review });
       setReviews([data, ...reviews]);
       setMsg("✅ Review submitted!");
       setShowReview(false);
@@ -51,6 +58,14 @@ export default function MentorProfile() {
   };
 
   if (loading) return <div className="spinner" />;
+
+  if (error) return (
+    <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-dim)" }}>
+      <p style={{ fontSize: 18 }}>⚠️ {error}</p>
+      <button className="btn-outline" onClick={() => navigate(-1)}>← Go Back</button>
+    </div>
+  );
+
   if (!mentor) return <p>Mentor not found.</p>;
 
   return (
@@ -64,67 +79,56 @@ export default function MentorProfile() {
       )}
 
       <div className="profile-layout">
-        {/* Left sidebar */}
         <div className="profile-sidebar">
           <div className="card" style={{ textAlign: "center" }}>
-            <div className="big-avatar">{mentor.name[0].toUpperCase()}</div>
+            <div className="big-avatar">{mentor.name?.[0]?.toUpperCase()}</div>
             <h2 className="profile-mentor-name">{mentor.name}</h2>
             <div className="badge" style={{ margin: "6px 0" }}>{mentor.experienceLevel}</div>
             <div className="mentor-domain-tag">{mentor.domain || "General"}</div>
 
             <div className="rating-display">
-  <span className="stars">
-    {mentor.rating > 0
-      ? "★".repeat(Math.round(mentor.rating)) + "☆".repeat(5 - Math.round(mentor.rating))
-      : "☆☆☆☆☆"}
-  </span>
-  <strong>{mentor.rating > 0 ? mentor.rating : "No ratings yet"}</strong>
-  {mentor.totalReviews > 0 && (
-    <span style={{ color: "var(--text-dim)", fontSize: 13 }}>
-      ({mentor.totalReviews} reviews)
-    </span>
-  )}
-</div>
+              <span className="stars">
+                {mentor.rating > 0
+                  ? "★".repeat(Math.round(mentor.rating)) + "☆".repeat(5 - Math.round(mentor.rating))
+                  : "☆☆☆☆☆"}
+              </span>
+              <strong>{mentor.rating > 0 ? mentor.rating : "No ratings yet"}</strong>
+              {mentor.totalReviews > 0 && (
+                <span style={{ color: "var(--text-dim)", fontSize: 13 }}>
+                  ({mentor.totalReviews} reviews)
+                </span>
+              )}
+            </div>
 
             <div className="availability">
-              <span className={`dot ${mentor.isAvailable ? "green" : "red"}`} />
-              {mentor.isAvailable ? "Available" : "Not Available"}
+              <span className={`dot ${mentor.availableForMentoring ? "green" : "red"}`} />
+              {mentor.availableForMentoring ? "Available" : "Not Available"}
             </div>
 
             {user && user._id !== mentor._id && (
-  <div className="profile-actions">
-    {(user.role === "mentee" ||
-      user.role === "both" ||
-      (user.roles && user.roles.includes("mentee"))) && (
-      <button
-        className="btn-primary"
-        style={{ width: "100%" }}
-        onClick={() => setShowBook(true)}>
-        📅 Book Session
-      </button>
-    )}
-    <Link
-      to={"/chat/" + mentor._id}
-      className="btn-outline"
-      style={{ display: "block", textAlign: "center" }}>
-      💬 Message
-    </Link>
-    {(user.role === "mentee" ||
-      user.role === "both" ||
-      (user.roles && user.roles.includes("mentee"))) && (
-      <button
-        className="btn-outline"
-        style={{ width: "100%" }}
-        onClick={() => setShowReview(true)}>
-        ⭐ Leave Review
-      </button>
-    )}
-  </div>
-)}
+              <div className="profile-actions">
+                {(user.role === "mentee" ||
+                  user.role === "both" ||
+                  (user.roles && user.roles.includes("mentee"))) && (
+                  <button className="btn-primary" style={{ width: "100%" }} onClick={() => setShowBook(true)}>
+                    📅 Book Session
+                  </button>
+                )}
+                <Link to={"/chat/" + mentor._id} className="btn-outline" style={{ display: "block", textAlign: "center" }}>
+                  💬 Message
+                </Link>
+                {(user.role === "mentee" ||
+                  user.role === "both" ||
+                  (user.roles && user.roles.includes("mentee"))) && (
+                  <button className="btn-outline" style={{ width: "100%" }} onClick={() => setShowReview(true)}>
+                    ⭐ Leave Review
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Main content */}
         <div className="profile-main">
           <div className="card">
             <h3>About</h3>
@@ -134,26 +138,24 @@ export default function MentorProfile() {
           <div className="card">
             <h3>Skills</h3>
             <div className="skills-list">
-              {mentor.skills.length > 0
-                ? mentor.skills.map((s) => <span key={s} className="tag" style={{ fontSize: 14, padding: "6px 14px" }}>{s}</span>)
+              {(mentor.skills || []).length > 0
+                ? (mentor.skills || []).map((s) => (
+                    <span key={s} className="tag" style={{ fontSize: 14, padding: "6px 14px" }}>{s}</span>
+                  ))
                 : <p style={{ color: "var(--text-dim)" }}>No skills listed.</p>}
             </div>
           </div>
 
           <div className="card">
-  <h3>Interests</h3>
-  <div className="skills-list">
-    {mentor.interests && mentor.interests.length > 0
-      ? mentor.interests.map(function(i) {
-          return (
-            <span key={i} className="badge" style={{ margin: 3, cursor: "default" }}>
-              {i}
-            </span>
-          );
-        })
-      : <p style={{ color: "var(--text-dim)" }}>No interests listed.</p>}
-  </div>
-</div>
+            <h3>Interests</h3>
+            <div className="skills-list">
+              {(mentor.interests || []).length > 0
+                ? (mentor.interests || []).map((i) => (
+                    <span key={i} className="badge" style={{ margin: 3, cursor: "default" }}>{i}</span>
+                  ))
+                : <p style={{ color: "var(--text-dim)" }}>No interests listed.</p>}
+            </div>
+          </div>
 
           <div className="card">
             <h3>Reviews ({reviews.length})</h3>
@@ -182,7 +184,6 @@ export default function MentorProfile() {
         </div>
       </div>
 
-      {/* Book Session Modal */}
       {showBook && (
         <div className="modal-overlay" onClick={() => setShowBook(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -221,7 +222,6 @@ export default function MentorProfile() {
         </div>
       )}
 
-      {/* Review Modal */}
       {showReview && (
         <div className="modal-overlay" onClick={() => setShowReview(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

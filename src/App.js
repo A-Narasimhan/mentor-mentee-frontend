@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
@@ -11,6 +11,43 @@ import Chat from "./pages/Chat";
 import Sessions from "./pages/Sessions";
 import Profile from "./pages/Profile";
 import Recommendations from "./pages/Recommendations";
+
+
+function ThemeInitializer() {
+  const { user } = useAuth();
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (!user) {
+      const saved = localStorage.getItem("theme");
+      
+      if (!saved) {
+        setTheme("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    window.__setTheme = setTheme;
+    window.__getTheme = () => theme;
+    return () => {
+      delete window.__setTheme;
+      delete window.__getTheme;
+    };
+  }, [theme]);
+
+  return null;
+}
+
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -27,6 +64,9 @@ const PublicRoute = ({ children }) => {
 export default function App() {
   return (
     <BrowserRouter>
+      {}
+      <ThemeInitializer />
+      {}
       <Routes>
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />

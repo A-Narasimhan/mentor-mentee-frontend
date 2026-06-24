@@ -1,10 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ─────────────────────────────
-   THEME VARIABLES (ONLY SOURCE OF TRUTH)
-───────────────────────────── */
 
-/* DARK THEME (default) */
 [data-theme="dark"] {
   --bg: #0f0f1a;
   --surface: #12121a;
@@ -23,7 +19,6 @@
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
 }
 
-/* LIGHT THEME */
 [data-theme="light"] {
   --bg: #f5f5ff;
   --surface: #ffffff;
@@ -42,16 +37,23 @@
   --shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
 
-/* ─────────────────────────────
-   GLOBAL CONSTANTS (NOT THEME)
-───────────────────────────── */
+
 :root {
   --radius: 12px;
+
+  --bg: #0f0f1a;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --text: #f0f0f8;
+  --text-dim: #8888aa;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --accent: #7c3aed;
+  --accent2: #ff6584;
+  --accent3: #43e97b;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
 }
 
-/* ─────────────────────────────
-   BASE STYLES
-───────────────────────────── */
 
 * {
   margin: 0;
@@ -64,7 +66,7 @@ html, body {
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family : "Verdana", "Helvetica", "Arial", sans-serif;;
   background: var(--bg);
   color: var(--text);
   transition: background 0.3s ease, color 0.3s ease;
@@ -72,7 +74,7 @@ body {
 
 /* Typography */
 h1,h2,h3,h4 {
-  font-family: 'Syne', sans-serif;
+  font-family: "Verdana", "Helvetica", "Arial", sans-serif;
 }
 
 a {
@@ -82,7 +84,7 @@ a {
 
 /* Inputs */
 input, textarea, select {
-  font-family: 'DM Sans', sans-serif;
+  font-family: "Verdana", "Helvetica", "Arial", sans-serif;
   background: var(--surface2);
   border: 1px solid var(--border);
   color: var(--text);
@@ -101,7 +103,7 @@ input:focus, textarea:focus, select:focus {
 button {
   cursor: pointer;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: "Verdana", "Helvetica", "Arial", sans-serif;
 }
 
 .btn-primary {
@@ -150,7 +152,6 @@ button {
   border-radius: 20px;
 }
 
-/* Tags */
 .tag {
   background: rgba(108,99,255,0.15);
   color: var(--accent);
@@ -160,7 +161,6 @@ button {
   margin: 2px;
 }
 
-/* Alerts */
 .alert-error {
   background: rgba(255,101,132,0.1);
   border: 1px solid rgba(255,101,132,0.3);
@@ -177,7 +177,7 @@ button {
   border-radius: 8px;
 }
 
-/* Scrollbar */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -189,7 +189,7 @@ button {
   border-radius: 3px;
 }
 
-/* Spinner */
+
 .spinner {
   width: 40px;
   height: 40px;
@@ -202,4 +202,42 @@ button {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+
+.auth-left {
+  background: var(--surface);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.auth-right {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+
+.logo-gradient {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+.theme-toggle {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: rotate(20deg);
 }

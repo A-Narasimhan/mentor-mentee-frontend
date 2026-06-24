@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+
+import { API } from "../context/AuthContext";
+
 import "./Auth.css";
 
 export default function Login() {
@@ -11,7 +13,6 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Forgot password states
   const [showForgot, setShowForgot] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -23,15 +24,15 @@ export default function Login() {
   const [forgotLoading, setForgotLoading] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
   const handleForgotPassword = async () => {
-    if (!forgotEmail) {
-      setForgotError("Please enter your email");
-      return;
-    }
+    if (!forgotEmail) { setForgotError("Please enter your email"); return; }
     setForgotLoading(true);
     setForgotError("");
     try {
-      const { data } = await axios.post("/api/auth/forgot-password", {
+  
+      const { data } = await API.post("/api/auth/forgot-password", {
+     
         email: forgotEmail,
       });
       setGeneratedCode(data.resetCode);
@@ -45,14 +46,12 @@ export default function Login() {
   };
 
   const handleResetPassword = async () => {
-    if (!resetCode || !newPassword) {
-      setForgotError("Please fill all fields");
-      return;
-    }
+    if (!resetCode || !newPassword) { setForgotError("Please fill all fields"); return; }
     setForgotLoading(true);
     setForgotError("");
     try {
-      await axios.post("/api/auth/reset-password", {
+
+      await API.post("/api/auth/reset-password", {
         email: forgotEmail,
         resetCode,
         newPassword,
@@ -70,6 +69,7 @@ export default function Login() {
       setForgotLoading(false);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -86,16 +86,34 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-left">
+      {/*
+        auth-left already has the correct className.
+        The problem is Auth.css overrides it with hardcoded colors.
+        Adding style prop here guarantees CSS variables win regardless
+        of specificity in Auth.css — inline styles always take priority.
+      */}
+      <div
+        className="auth-left"
+        style={{ background: "var(--surface)", color: "var(--text)", transition: "background 0.3s ease" }}
+      >
         <div className="auth-hero">
+          {/* ⚡ icon and heading now use CSS variables via parent */}
           <div className="hero-icon">⚡</div>
-          <h1>MentorMatch</h1>
-          <p>Connect with experienced mentors.<br />Accelerate your growth.</p>
-          
+          {/*
+            Logo text: replace hardcoded color with logo-gradient class
+            defined in index.css so it responds to theme
+          */}
+          <h1 className="logo-gradient">Mentor Match</h1>
+          <p style={{ color: "var(--text-dim)" }}>
+            Connect with experienced mentors.<br />Accelerate your growth.
+          </p>
         </div>
       </div>
 
-      <div className="auth-right">
+      <div
+        className="auth-right"
+        style={{ background: "var(--bg)", color: "var(--text)", transition: "background 0.3s ease" }}
+      >
         <div className="auth-card">
           <h2>Welcome back</h2>
           <p className="auth-sub">Sign in to your account</p>
@@ -103,9 +121,7 @@ export default function Login() {
           {error && <div className="alert-error">{error}</div>}
 
           {forgotMsg && !showForgot && (
-            <div className="alert-success" style={{ marginBottom: 16 }}>
-              {forgotMsg}
-            </div>
+            <div className="alert-success" style={{ marginBottom: 16 }}>{forgotMsg}</div>
           )}
 
           {!showForgot ? (
@@ -128,7 +144,7 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => { setShowForgot(true); setForgotMsg(""); setForgotError(""); }}
-                      style={{ background: "none", border: "none", color: "var(--primary, #7c3aed)", cursor: "pointer", fontSize: 13 }}>
+                      style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: 13 }}>
                       Forgot password?
                     </button>
                   </div>
@@ -145,7 +161,6 @@ export default function Login() {
                   {loading ? "Signing in..." : "Sign In →"}
                 </button>
               </form>
-
               <p className="auth-link">
                 Don't have an account? <Link to="/register">Register</Link>
               </p>
@@ -180,9 +195,14 @@ export default function Login() {
               ) : (
                 <>
                   {generatedCode && (
-                    <div style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, textAlign: "center" }}>
+                    <div style={{
+                      background: "rgba(124,58,237,0.1)",
+                      border: "1px solid rgba(124,58,237,0.3)",
+                      borderRadius: 10, padding: "12px 16px",
+                      marginBottom: 16, textAlign: "center"
+                    }}>
                       <div style={{ fontSize: 12, color: "var(--text-dim)", marginBottom: 4 }}>YOUR RESET CODE</div>
-                      <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 6, color: "#7c3aed" }}>
+                      <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 6, color: "var(--accent)" }}>
                         {generatedCode}
                       </div>
                       <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 4 }}>Valid for 15 minutes</div>

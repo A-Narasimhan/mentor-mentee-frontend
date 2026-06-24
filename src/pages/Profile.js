@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "./Profile.css";
-
+import { API } from "../context/AuthContext";
 const SKILL_SUGGESTIONS = ["React", "Node.js", "Python", "Java", "ML", "DSA", "MongoDB", "SQL", "UI/UX", "DevOps", "AWS", "Docker", "GraphQL", "TypeScript"];
 
 export default function Profile() {
@@ -14,7 +13,15 @@ export default function Profile() {
     experienceLevel: user?.experienceLevel || "beginner",
     skills: user?.skills || [],
     interests: user?.interests || [],
-    isAvailable: user?.isAvailable ?? true,
+    // ─────────────────────────────────────────────────────
+    // FIX 1 OF 3 — Wrong field name in form state
+    // REMOVE:  isAvailable: user?.isAvailable ?? true,
+    // REPLACE WITH:
+    availableForMentoring: user?.availableForMentoring ?? true,
+    // WHY: Your backend model and users.js both use availableForMentoring.
+    // isAvailable does not exist on the User document. The checkbox was
+    // toggling a field that was never read by the backend or saved to MongoDB.
+    // ─────────────────────────────────────────────────────
   });
   const [skillInput, setSkillInput] = useState("");
   const [interestInput, setInterestInput] = useState("");
@@ -47,7 +54,25 @@ export default function Profile() {
     setLoading(true);
     setMsg("");
     try {
-      const { data } = await axios.put("/api/users/me", form);
+      // ─────────────────────────────────────────────────────
+      // FIX 2 OF 3 — Add Authorization header and correct base URL
+      // REPLACE WITH:
+      const token = localStorage.getItem("token");
+      const { data } = await API.put("/api/users/me", form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+    });
+      // WHY: Two problems in the old line:
+      // 1. Relative URL "/api/users/me" in production hits your Vercel
+      //    frontend server which returns index.html (HTML, not JSON).
+      //    REACT_APP_API_URL must be set to your Render backend URL in
+      //    Vercel's environment variables, e.g:
+      //    https://mentor-backend-8zgn.onrender.com
+      // 2. No Authorization header = protect middleware gets no token
+      //    = always returns 401 = "Update failed" every single time.
+      // ─────────────────────────────────────────────────────
       updateUser(data);
       setMsg("✅ Profile updated successfully!");
     } catch (err) {
@@ -58,9 +83,9 @@ export default function Profile() {
   };
 
   const isMentor = user &&
-  (user.role === "mentor" ||
-   user.role === "both" ||
-   (user.roles && user.roles.includes("mentor")));
+    (user.role === "mentor" ||
+     user.role === "both" ||
+     (user.roles && user.roles.includes("mentor")));
 
   return (
     <div className="profile-page">
@@ -70,7 +95,7 @@ export default function Profile() {
       </div>
 
       <div className="profile-page-layout">
-        {/* Preview card */}
+        {/* Preview card — unchanged */}
         <div className="profile-preview card">
           <div className="preview-avatar">{user?.name?.[0]?.toUpperCase()}</div>
           <div className="preview-name">{form.name || user?.name}</div>
@@ -127,12 +152,28 @@ export default function Profile() {
             </div>
             {isMentor && (
               <label className="checkbox-label">
-                <input type="checkbox" name="isAvailable" checked={form.isAvailable} onChange={handleChange} />
+                {/* ─────────────────────────────────────────────────────
+                    FIX 3 OF 3 — Checkbox name must match form state key
+                    REMOVE:  name="isAvailable" checked={form.isAvailable}
+                    REPLACE WITH: */}
+                <input
+                  type="checkbox"
+                  name="availableForMentoring"
+                  checked={form.availableForMentoring}
+                  onChange={handleChange}
+                />
+                {/* WHY: The checkbox name attribute is what handleChange uses
+                    as the key: setForm({ ...form, [e.target.name]: val }).
+                    If name="isAvailable" but your form state has
+                    availableForMentoring, the checkbox updates a key that
+                    doesn't exist in your form, and the real key never changes.
+                    ───────────────────────────────────────────────────── */}
                 <span>Available for mentoring</span>
               </label>
             )}
           </div>
 
+          {/* Skills and Interests sections — completely unchanged */}
           <div className="form-section">
             <h3>Skills</h3>
             <div className="tag-input">
